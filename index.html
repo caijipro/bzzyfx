@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaiJi资源分源导航</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Arial', sans-serif;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            box-shadow: 0 2px 12px #e0e0e0;
+            border-radius: 0 0 18px 18px;
+        }
+        .navbar-brand {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #6a82fb !important;
+            letter-spacing: 2px;
+        }
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-top: 48px;
+            text-shadow: 0 2px 8px #fff8;
+        }
+        .subtitle {
+            color: #555;
+            margin-bottom: 36px;
+            font-size: 1.2rem;
+        }
+        .code-section {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px #b3b3b333;
+            padding: 38px 24px 32px 24px;
+            margin: 40px auto 36px auto;
+            text-align: center;
+            max-width: 480px;
+            position: relative;
+        }
+        .code-section .bi {
+            font-size: 2.2rem;
+            color: #6a82fb;
+            margin-bottom: 10px;
+        }
+        .code-input {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px 18px;
+            width: 240px;
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+        .go-btn {
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 28px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #fc5c7d22;
+        }
+        .go-btn:hover {
+            background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+            box-shadow: 0 4px 16px #6a82fb33;
+        }
+        .resource-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 28px;
+            justify-content: center;
+        }
+        .resource-card {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px #b3b3b366;
+            padding: 32px 24px 24px 24px;
+            min-width: 270px;
+            max-width: 340px;
+            flex: 1 1 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: transform 0.18s, box-shadow 0.18s;
+            position: relative;
+        }
+        .resource-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 16px 48px #b3b3b399;
+        }
+        .resource-title {
+            font-size: 1.18rem;
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 6px;
+        }
+        .resource-desc {
+            color: #888;
+            font-size: 0.98rem;
+            margin-bottom: 12px;
+        }
+        .pan-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: #6a82fb;
+            border-radius: 6px;
+            padding: 2px 10px 2px 6px;
+            background: #fff;
+            border: 1.2px solid #e0e0e0;
+            box-shadow: none;
+            margin-right: 8px;
+        }
+        .pan-type-badge .bi {
+            font-size: 1.1rem;
+        }
+        .resource-link-btn {
+            margin-top: auto;
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 24px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .resource-link-btn:hover {
+            background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+        }
+        .footer {
+            background: rgba(255,255,255,0.97);
+            padding: 18px 0 10px 0;
+            margin-top: 48px;
+            border-top: 1px solid #eee;
+            border-radius: 18px 18px 0 0;
+            color: #888;
+            font-size: 0.98rem;
+        }
+        .footer a {
+            color: #6a82fb;
+            text-decoration: underline;
+            margin: 0 8px;
+        }
+        @media (max-width: 600px) {
+            .main-title { font-size: 1.5rem; }
+            .resource-list { gap: 16px; }
+            .resource-card { min-width: 90vw; max-width: 98vw; padding: 18px 8px; }
+            .code-section { padding: 18px 4px 18px 4px; }
+        }
+        /* 加载动画样式 */
+        #loading {
+            position: fixed;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s;
+        }
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 7px solid #fff;
+            border-top: 7px solid #6a82fb;
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(.68,-0.55,.27,1.55) infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* 页面弹跳动画 */
+        .site-content {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.4s, transform 0.5s ease-out;
+        }
+        .site-content.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* 关于自定义弹窗，无蒙版 */
+        #aboutPopup {
+            display: none;
+            position: fixed;
+            top: 60px;
+            right: 40px;
+            z-index: 9999;
+            max-width: 420px;
+            width: 90vw;
+            box-shadow: 0 8px 32px #b3b3b366;
+            background: #fff;
+            border-radius: 18px;
+            padding: 1.5rem;
+            animation: popupIn 0.4s;
+        }
+        @keyframes popupIn {
+            0% { opacity: 0; transform: translateY(-30px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (max-width: 600px) {
+            #aboutPopup { right: 5vw; top: 10vw; padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>
+    <div class="site-content" id="siteContent">
+    <!-- 顶部导航 -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">CaiJi资源分源导航</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#code" onclick="scrollToCode(event)">暗号入口</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about" onclick="scrollToAbout(event)">关于</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container text-center">
+        <div class="main-title">CaiJi资源分源导航</div>
+        <div class="subtitle">输入B站视频简介暗号，即可直达详细页面！</div>
+    </div>
+
+    <!-- 暗号输入区块 -->
+    <div class="container" id="code">
+        <div class="code-section">
+            <div><i class="bi bi-key"></i></div>
+            <h5 style="font-weight:600;">输入暗号，解锁专属资源</h5>
+            <form id="codeForm" class="d-flex justify-content-center align-items-center flex-wrap gap-2 mt-3" onsubmit="return handleCode(event)">
+                <input type="text" class="code-input" id="codeInput" placeholder="请输入暗号..." required autofocus>
+                <button type="submit" class="go-btn">解锁</button>
+            </form>
+            <div id="codeMsg" style="color:#fc5c7d;margin-top:12px;display:none;"></div>
+        </div>
+    </div>
+
+    <!-- 关于自定义弹窗，无蒙版 -->
+    <div id="aboutPopup" style="display:none;position:fixed;top:60px;right:40px;z-index:9999;max-width:420px;width:90vw;box-shadow:0 8px 32px #b3b3b366;background:#fff;border-radius:18px;padding:1.5rem;animation:popupIn .4s;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="color:#6a82fb;font-size:1.3rem;margin:0;"><i class="bi bi-info-circle"></i> 关于本站</h3>
+        <button onclick="closeAboutPopup()" style="background:none;border:none;font-size:1.5rem;line-height:1;color:#888;cursor:pointer;">&times;</button>
+      </div>
+      <div style="font-size:1.1rem;line-height:1.8;color:#444;margin-top:10px;">
+        CaiJi资源分源导航是一个专为UP主和资源分享爱好者打造的暗号直达型资源站。<br>
+        你可以在B站视频简介获取暗号，输入后即可一键跳转到专属资源页面。<br>
+        本站不存储任何资源文件，仅做资源导航与跳转，所有资源均由UP主或网友自发分享。<br>
+        <b>使用建议：</b>请勿传播违法违规内容，发现问题请及时联系站长处理。<br>
+        <b>开源托管：</b>本项目基于GitHub Pages部署，前端与数据完全开源，欢迎学习与交流。
+      </div>
+    </div>
+
+    <!-- 前往B站主页按钮 -->
+    <div class="container text-center" style="margin-top:36px;">
+        <a href="https://space.bilibili.com/3546863896628031" target="_blank" class="go-btn" style="font-size:1.15rem;padding:12px 38px;display:inline-block;">前往哔哩哔哩主页</a>
+    </div>
+
+    <!-- 友情链接和页脚 -->
+    <div class="footer text-center">
+        <span>Copyright © 2025 CaiJi资源分源导航 | Powered by <strong>Hello</strong></span>
+    </div>
+
+    <!-- 广告轮播图，网页最底部 -->
+    <div class="w-100 p-0 m-0" style="width:100vw;max-width:100vw;">
+        <div id="adCarousel" class="carousel slide" data-bs-ride="carousel" style="width:100vw;max-width:100vw;">
+            <div class="carousel-inner rounded-0 shadow" style="width:100vw;max-width:100vw;">
+                <div class="carousel-item active">
+                    <img src="https://pic1.imgdb.cn/item/685a924858cb8da5c86c109e.png" class="d-block w-100" alt="广告1" style="object-fit:cover;height:180px;width:100vw;max-width:100vw;">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://pic1.imgdb.cn/item/685a925058cb8da5c86c10a7.png" class="d-block w-100" alt="广告2" style="object-fit:cover;height:180px;width:100vw;max-width:100vw;">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#adCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">上一张</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#adCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">下一张</span>
+            </button>
+        </div>
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 自动从GitHub Pages加载data.json
+        let resourceList = [];
+        fetch('https://raw.githubusercontent.com/caijipro/bzzyfx/main/data.json')
+            .then(res => res.json())
+            .then(data => {
+                resourceList = data;
+                renderResourceList();
+            });
+
+        // 加载动画逻辑
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.getElementById('loading').style.opacity = 0;
+                setTimeout(function() {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('siteContent').classList.add('show');
+                }, 500);
+            }, 1200); // 动画持续时间可调
+        });
+        // 导航栏锚点平滑滚动
+        function scrollToCode(e) {
+            e.preventDefault();
+            document.getElementById('code').scrollIntoView({behavior:'smooth'});
+        }
+        function scrollToAbout(e) {
+            e.preventDefault();
+            var popup = document.getElementById('aboutPopup');
+            popup.style.display = 'block';
+            popup.style.animation = 'popupIn 0.4s';
+        }
+        function closeAboutPopup() {
+            var popup = document.getElementById('aboutPopup');
+            popup.style.display = 'none';
+        }
+        // 暗号跳转逻辑
+        function handleCode(e) {
+            if (e) e.preventDefault();
+            const code = document.getElementById('codeInput').value.trim();
+            const msg = document.getElementById('codeMsg');
+            const found = resourceList.find(r => r.code === code);
+            if (found) {
+                window.location.href = 'detail.html?code=' + code;
+            } else {
+                msg.style.display = 'block';
+                msg.innerText = '暗号错误，请检查后重试！';
+            }
+            return false;
+        }
+        // 资源卡片渲染
+        function getPanIcon(type) {
+            type = (type||'').toLowerCase();
+            if(type.includes('百度')) return '<i class="bi bi-cloud"></i>';
+            if(type.includes('夸克')) return '<i class="bi bi-lightning-charge"></i>';
+            if(type.includes('uc')) return '<i class="bi bi-globe"></i>';
+            if(type.includes('123')) return '<i class="bi bi-123"></i>';
+            if(type.includes('蓝奏')) return '<i class="bi bi-folder-symlink"></i>';
+            if(type.includes('huang')) return '<i class="bi bi-hdd-stack"></i>';
+            if(type.includes('其他')) return '<i class="bi bi-question-circle"></i>';
+            return '<i class="bi bi-box"></i>';
+        }
+        // 已删除资源列表渲染函数
+    </script>
+</body>
+</html> 

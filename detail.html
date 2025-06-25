@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源详情 - CaiJi资源分源导航</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Arial', sans-serif;
+        }
+        .detail-card {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 32px #b3b3b366;
+            padding: 48px 38px 38px 38px;
+            max-width: 480px;
+            margin: 90px auto 0 auto;
+            text-align: center;
+            position: relative;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .detail-card:hover {
+            box-shadow: 0 16px 48px #b3b3b399;
+            transform: translateY(-4px) scale(1.01);
+        }
+        .detail-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6a82fb;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+        .detail-desc {
+            color: #555;
+            font-size: 1.15rem;
+            margin-bottom: 32px;
+            line-height: 1.8;
+        }
+        .pan-type {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            font-size: 1.13rem;
+            font-weight: 600;
+            color: #fff;
+            border-radius: 8px;
+            padding: 7px 18px 7px 12px;
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            box-shadow: 0 2px 8px #fc5c7d22;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .pan-type .bi {
+            font-size: 1.5rem;
+        }
+        .go-btn {
+            background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 44px;
+            font-weight: bold;
+            font-size: 1.18rem;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px #fc5c7d22;
+        }
+        .go-btn:hover {
+            background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%);
+            box-shadow: 0 4px 16px #6a82fb33;
+        }
+        .notfound {
+            color: #fc5c7d;
+            font-size: 1.3rem;
+            margin-top: 120px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .detail-card { max-width: 98vw; padding: 18px 4vw 18px 4vw; }
+            .detail-title { font-size: 1.2rem; }
+            .detail-desc { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainDetail"></div>
+    <script>
+        // 获取URL参数
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+        // 资源详情渲染
+        const code = getQueryParam('code');
+        fetch('https://raw.githubusercontent.com/caijipro/bzzyfx/main/data.json')
+            .then(res => res.json())
+            .then(list => {
+                const item = list.find(r => r.code === code);
+                const main = document.getElementById('mainDetail');
+                if (item) {
+                    // 网盘类型图标和色彩
+                    function getPanIcon(type) {
+                        type = (type||'').toLowerCase();
+                        if(type.includes('百度')) return '<i class="bi bi-cloud"></i>';
+                        if(type.includes('夸克')) return '<i class="bi bi-lightning-charge"></i>';
+                        if(type.includes('uc')) return '<i class="bi bi-globe"></i>';
+                        if(type.includes('123')) return '<i class="bi bi-123"></i>';
+                        if(type.includes('蓝奏')) return '<i class="bi bi-folder-symlink"></i>';
+                        if(type.includes('huang')) return '<i class="bi bi-hdd-stack"></i>';
+                        if(type.includes('其他')) return '<i class="bi bi-question-circle"></i>';
+                        return '<i class="bi bi-box"></i>';
+                    }
+                    main.innerHTML = `
+                        <div class='detail-card'>
+                            <div class='detail-title'><i class="bi bi-link-45deg"></i> ${item.title}</div>
+                            <div class='detail-desc'>${item.desc || ''}</div>
+                            <div class='pan-type'>
+                                ${getPanIcon(item.type)}
+                                <span>${item.type ? item.type : '未知'}</span>
+                            </div>
+                            <a class='go-btn' href='${item.url}' target='_blank'>立即前往</a>
+                        </div>
+                    `;
+                } else {
+                    main.innerHTML = `<div class='notfound'>未找到该资源，暗号无效或已失效。</div>`;
+                }
+            });
+    </script>
+</body>
+</html> 
